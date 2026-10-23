@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DravSports Wears | Premium Sportswear Shop Chuka Town & Countrywide Delivery</title>
+  <meta name="description" content="DravSports Wears is your #1 online sports platform based in Chuka Town, Tharaka Nithi County, Kenya. Shop Football, Basketball, Athletics, Gym, Swimming & Rugby sportswear with fast countrywide delivery.">
+  
+  <!-- FontAwesome Icons & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Modal Overlay -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+
+  <!-- Navigation Header -->
+  <header class="header">
+    <div class="container">
+      <nav class="nav-bar">
+        <a href="#" class="logo-brand">
+          <div class="logo-icon">
+            <i class="fas fa-running"></i>
+          </div>
+          <div>
+            <span id="brandNamePrefix">DRAV</span><span class="logo-highlight" id="brandNameSuffix">SPORTS</span>
+          </div>
+        </a>
+
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="#hero" class="nav-link active">Home</a></li>
+          <li><a href="#catalog" class="nav-link">Sports Catalog</a></li>
+          <li><a href="#about" class="nav-link">About Us</a></li>
+          <li><a href="#team" class="nav-link">Our Team</a></li>
+          <li><a href="#branches" class="nav-link">Branches</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+          <li><a href="admin.html" class="nav-link" style="color: var(--accent-primary);"><i class="fas fa-user-shield"></i> Backend Admin</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <!-- Theme Toggle -->
+          <button class="btn-icon-badge" id="themeToggle" title="Toggle Dark/Light Mode">
+            <i class="fas fa-sun"></i>
+          </button>
+
+          <!-- Upload Sportswear Button -->
+          <button class="btn-outline" id="openUploadBtn" style="padding: 0.55rem 1.1rem; font-size: 0.88rem;">
+            <i class="fas fa-cloud-upload-alt"></i> Upload Wear
+          </button>
+
+          <!-- Order Bucket / Cart Button -->
+          <button class="btn-icon-badge" id="cartBtn" title="View Order Bucket">
+            <i class="fas fa-shopping-basket"></i>
+            <span class="badge-count" id="cartBadgeCount">0</span>
+          </button>
+
+          <!-- Mobile Toggle Button -->
+          <button class="mobile-toggle" id="mobileToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="hero-bg-overlay"></div>
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <div class="location-pill">
+            <i class="fas fa-map-marker-alt"></i> <span id="heroLocationText">Chuka Town &amp; Nairobi Branches • Delivery Countrywide 🇰🇪</span>
+          </div>
+          <h1 class="hero-title">
+            <span id="heroTitlePrefix">ELEVATE YOUR GAME WITH</span> <span class="text-gradient" id="heroTitleHighlight">PREMIUM SPORTSWEAR</span>
+          </h1>
+          <p class="hero-desc" id="heroDescription">
+            Discover original, high-performance athletic apparel, football kits, running sneakers, gym compression wear, and sports gear. Fast doorstep &amp; courier delivery across all 47 counties in Kenya!
+          </p>
+          <div class="hero-cta-group">
+            <a href="#catalog" class="btn-primary">
+              <i class="fas fa-store"></i> <span id="heroPrimaryCtaText">Explore Sports Catalog</span>
+            </a>
+            <a href="https://wa.me/254720357085" target="_blank" class="btn-whatsapp js-whatsapp-link">
+              <i class="fab fa-whatsapp"></i> <span id="heroWhatsappCtaText">Chat on WhatsApp</span>
+            </a>
+          </div>
+
+          <div class="hero-stats" id="heroStats">
+            <!-- Rendered from backend content -->
+          </div>
+        </div>
+
+        <div class="hero-image-wrapper">
+          <div class="hero-img-card">
+            <img src="images/hero.png" alt="DravSports Wears Store Showcase" onerror="this.src='https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800&auto=format&fit=crop&q=80';">
+            <div class="hero-badge-overlay">
+              <div class="badge-info">
+                <h4>DravSports Headquarters</h4>
+                <p>Chuka Town, Tharaka Nithi County</p>
+              </div>
+              <a href="#contact" class="btn-outline" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;">
+                <i class="fas fa-directions"></i> Contact Us
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sports Catalog Section -->
+  <section class="category-section" id="catalog">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Current Uploads & Prices</span>
+        <h2 class="section-title">Explore Sportswear By Sport</h2>
+        <p class="section-subtitle">Browse through our current inventory categorized by your favorite sport. Add items to your bucket to place orders easily.</p>
+      </div>
+
+      <!-- Controls Wrapper (Search, Filters, Sort) -->
+      <div class="controls-wrapper">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Search jersey, shoes, gym gear, sports category...">
+        </div>
+
+        <div class="category-tabs">
+          <button class="cat-tab active" data-category="all">
+            <i class="fas fa-th-large"></i> All Sports
+          </button>
+          <button class="cat-tab" data-category="football">
+            <i class="fas fa-football-ball"></i> Football
+          </button>
+          <button class="cat-tab" data-category="basketball">
+            <i class="fas fa-basketball-ball"></i> Basketball
+          </button>
+          <button class="cat-tab" data-category="athletics">
+            <i class="fas fa-running"></i> Athletics
+          </button>
+          <button class="cat-tab" data-category="gym">
+            <i class="fas fa-dumbbell"></i> Gym & Fitness
+          </button>
+          <button class="cat-tab" data-category="swimming">
+            <i class="fas fa-swimmer"></i> Swimming
+          </button>
+          <button class="cat-tab" data-category="rugby">
+            <i class="fas fa-football-ball"></i> Rugby
+          </button>
+          <button class="cat-tab" data-category="accessories">
+            <i class="fas fa-toolbox"></i> Accessories
+          </button>
+        </div>
+
+        <select class="sort-select" id="sortSelect">
+          <option value="newest">Sort by: Newest Uploads</option>
+          <option value="low-to-high">Price: Low to High</option>
+          <option value="high-to-low">Price: High to Low</option>
+        </select>
+      </div>
+
+      <!-- Product Dynamic Grid -->
+      <div class="products-grid" id="productsGrid">
+        <!-- Rendered via app.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- About Us Section -->
+  <section class="about-section" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div>
+          <span class="section-tag" id="aboutTag">About DravSports Wears</span>
+          <h2 class="section-title" style="text-align: left; margin-bottom: 1.25rem;" id="aboutTitle">
+            Your Premier Sports Partner in Tharaka Nithi, Nairobi &amp; Countrywide Kenya
+          </h2>
+          <div id="aboutParagraphs">
+            <!-- Rendered from backend content -->
+          </div>
+
+          <div class="about-feature-list" id="aboutFeatures">
+            <!-- Rendered from backend content -->
+          </div>
+        </div>
+
+        <div style="position: relative;">
+          <div style="border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-md);">
+            <img src="images/hero.png" alt="DravSports About Us" style="width: 100%; height: 420px; object-fit: cover;">
+          </div>
+          <div style="position: absolute; bottom: -20px; right: 20px; background: var(--bg-surface); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-highlight); box-shadow: var(--shadow-md);">
+            <div style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--accent-primary);">Chuka &amp; Nairobi</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Tharaka Nithi County &amp; Nairobi, Kenya</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Our Team Section -->
+  <section class="team-section" id="team">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" id="teamTag">Meet Our Staff</span>
+        <h2 class="section-title" id="teamTitle">The Dedicated Team Behind DravSports</h2>
+        <p class="section-subtitle" id="teamSubtitle">Passionate sports enthusiasts delivering excellence from Chuka Town and Nairobi to your doorstep.</p>
+      </div>
+
+      <div class="team-grid" id="teamGrid">
+        <!-- Rendered from backend content -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Our Branches Section -->
+  <section class="branches-section" id="branches">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" id="branchesTag">Our Branches</span>
+        <h2 class="section-title" id="branchesTitle">Visit Us At Either Branch</h2>
+        <p class="section-subtitle" id="branchesSubtitle">Two convenient locations in Kenya. Walk in, or order online and we deliver countrywide.</p>
+      </div>
+
+      <div class="branches-grid" id="branchesGrid">
+        <!-- Rendered from backend content -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact & WhatsApp Section -->
+  <section class="contact-section" id="contact">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" id="contactTag">Get In Touch</span>
+        <h2 class="section-title" id="contactTitle">Contact &amp; Location Info</h2>
+        <p class="section-subtitle" id="contactSubtitle">Reach out directly or connect with us on WhatsApp for fast order verification and delivery countrywide.</p>
+      </div>
+
+      <div class="contact-grid">
+        <div class="contact-card">
+          <div class="contact-info-item">
+            <div class="contact-icon"><i class="fas fa-location-dot"></i></div>
+            <div class="contact-details">
+              <h4>Physical Store Locations</h4>
+              <p id="contactAddress">Chuka Town, Commercial Center Near University Gate 1,<br>Tharaka Nithi County &amp; Nairobi, Kenya.</p>
+            </div>
+          </div>
+
+          <div class="contact-info-item">
+            <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+            <div class="contact-details">
+              <h4>Phone Contacts</h4>
+              <p id="contactPhones">0720 357 085</p>
+            </div>
+          </div>
+
+          <div class="contact-info-item">
+            <div class="contact-icon"><i class="fab fa-whatsapp"></i></div>
+            <div class="contact-details">
+              <h4>WhatsApp Direct Order Line</h4>
+              <p id="contactWhatsapp">0720 357 085 (Fast Order Verification &amp; Inquiries)</p>
+            </div>
+          </div>
+
+          <div class="contact-info-item">
+            <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+            <div class="contact-details">
+              <h4>Email Address</h4>
+              <p id="contactEmails">dravtechcompany@gmail.com</p>
+            </div>
+          </div>
+
+          <div style="margin-top: 1rem;">
+            <a href="https://wa.me/254720357085" target="_blank" class="btn-whatsapp js-whatsapp-link" style="width: 100%; justify-content: center; padding: 0.9rem;">
+              <i class="fab fa-whatsapp"></i> Connect Directly on WhatsApp Now
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Inquiry Form -->
+        <div class="contact-card">
+          <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800;">Send Us A Direct Message</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Have questions about sports wear sizes, team jersey orders, or delivery to your county? Fill in below.</p>
+          
+          <form onsubmit="event.preventDefault(); showToast('Thank you! Your message has been sent to DravSports team.'); this.reset();">
+            <div class="form-group">
+              <label>Your Full Name</label>
+              <input type="text" class="form-control" placeholder="e.g. John Mwangi" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" class="form-control" placeholder="e.g. 0712345678" required>
+              </div>
+              <div class="form-group">
+                <label>Your County / Town</label>
+                <input type="text" class="form-control" placeholder="e.g. Chuka / Nairobi" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Message / Inquiries</label>
+              <textarea class="form-control" rows="4" placeholder="Mention the sport wear or team kit details you are looking for..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
+              <i class="fas fa-paper-plane"></i> Send Inquiry Message
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Shopping Bucket Drawer (Cart & Order Request) -->
+  <aside class="cart-drawer" id="cartDrawer">
+    <div class="drawer-header">
+      <div class="drawer-title">
+        <i class="fas fa-shopping-basket" style="color: var(--accent-primary)"></i> Your Order Bucket
+      </div>
+      <button class="drawer-close" id="drawerClose"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="drawer-body">
+      <div id="cartItemsList">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <div class="drawer-footer">
+      <div class="delivery-select-group">
+        <label><i class="fas fa-truck"></i> Select Delivery Location:</label>
+        <select id="deliverySelect">
+          <option value="chuka_town">Chuka Town (Free Store Pickup / Fast Dispatch)</option>
+          <option value="tharaka_nithi">Tharaka Nithi County Doorstep (KSh 150)</option>
+          <option value="meru_embu">Meru / Embu Towns (KSh 200)</option>
+          <option value="nairobi">Nairobi Express Parcel (KSh 300)</option>
+          <option value="countrywide">Rest of Kenya (Mombasa, Kisumu, Eldoret etc.) (KSh 350)</option>
+        </select>
+      </div>
+
+      <div class="delivery-select-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+        <input type="text" id="customerName" placeholder="Your Name" value="Customer">
+        <input type="tel" id="customerPhone" placeholder="Phone (e.g. 0712345678)">
+      </div>
+
+      <div class="delivery-select-group">
+        <input type="text" id="customerLocation" placeholder="Specific Delivery Address / Landmark in Town" value="Chuka Town">
+      </div>
+
+      <div class="cart-summary-line">
+        <span>Items Subtotal:</span>
+        <strong id="cartSubtotal">KSh 0</strong>
+      </div>
+      <div class="cart-summary-line">
+        <span>Estimated Delivery Fee:</span>
+        <strong id="deliveryFee">KSh 0</strong>
+      </div>
+      <div class="cart-total-line">
+        <span>Grand Total:</span>
+        <span id="cartGrandTotal" style="color: var(--accent-primary);">KSh 0</span>
+      </div>
+
+      <button class="btn-whatsapp" id="btnCheckoutWhatsApp" style="width: 100%; justify-content: center; padding: 0.9rem; font-size: 1rem;">
+        <i class="fab fa-whatsapp"></i> Place Order via WhatsApp
+      </button>
+    </div>
+  </aside>
+
+  <!-- Upload Sportswear Modal -->
+  <div class="custom-modal" id="uploadModal">
+    <div class="modal-header">
+      <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800;">
+        <i class="fas fa-cloud-upload-alt" style="color: var(--accent-primary);"></i> Upload New Sportswear
+      </h3>
+      <button class="drawer-close" id="closeUploadModal"><i class="fas fa-times"></i></button>
+    </div>
+
+    <form id="uploadProductForm">
+      <div class="form-group">
+        <label>Sportswear Title / Name *</label>
+        <input type="text" class="form-control" id="productTitle" placeholder="e.g. Adidas Predator Football Cleats 2026" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Sport Category *</label>
+          <select class="form-control" id="productCategory" required>
+            <option value="football">Football / Soccer</option>
+            <option value="basketball">Basketball</option>
+            <option value="athletics">Athletics & Running</option>
+            <option value="gym">Gym & Fitness</option>
+            <option value="swimming">Swimming</option>
+            <option value="rugby">Rugby</option>
+            <option value="accessories">Sports Accessories</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Price in Kenya Shillings (KSh) *</label>
+          <input type="number" class="form-control" id="productPrice" placeholder="e.g. 2500" min="1" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Available Sizes (Comma separated)</label>
+        <input type="text" class="form-control" id="productSizes" placeholder="e.g. S, M, L, XL, XXL or 40, 41, 42, 43">
+      </div>
+
+      <div class="form-group">
+        <label>Upload Item Image File</label>
+        <input type="file" id="productImageInput" accept="image/*" style="display: none;">
+        <div class="image-preview-box" id="imagePreviewBox" onclick="document.getElementById('productImageInput').click();">
+          <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--text-muted); margin-bottom: 0.5rem;"></i>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">Click here to select an image from your device</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Or Paste Image URL (Optional fallback)</label>
+        <input type="url" class="form-control" id="productImageUrl" placeholder="https://example.com/jersey.jpg">
+      </div>
+
+      <div class="form-group">
+        <label>Item Description & Features</label>
+        <textarea class="form-control" id="productDescription" rows="3" placeholder="Describe fabric quality, fit type, breathability..."></textarea>
+      </div>
+
+      <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem;">
+        <i class="fas fa-check-circle"></i> Save & Publish Upload
+      </button>
+    </form>
+  </div>
+
+  <!-- Quick View Modal -->
+  <div class="custom-modal" id="quickViewModal">
+    <div class="modal-header">
+      <h3 style="font-family: var(--font-heading); font-size: 1.2rem;">Item Details</h3>
+      <button class="drawer-close" onclick="closeModal('quickViewModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="quickViewContent">
+      <!-- Injected dynamically -->
+    </div>
+  </div>
+
+  <!-- Floating WhatsApp Widget -->
+  <a href="https://wa.me/254720357085" class="whatsapp-float js-whatsapp-link" target="_blank" title="Chat on WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="#" class="logo-brand" style="margin-bottom: 1rem; display: inline-flex;">
+            <div class="logo-icon"><i class="fas fa-running"></i></div>
+            <div><span id="footerBrandNamePrefix">DRAV</span><span class="logo-highlight" id="footerBrandNameSuffix">SPORTS</span></div>
+          </a>
+          <p style="margin-top: 0.5rem;" id="footerDescription">Your premier sportswear platform with branches in Chuka Town and Nairobi. Quality sports gear delivered nationwide across Kenya.</p>
+        </div>
+
+        <div>
+          <h4>Quick Links</h4>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem;">
+            <li><a href="#catalog">Sports Catalog</a></li>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#team">Our Team</a></li>
+            <li><a href="#branches">Our Branches</a></li>
+            <li><a href="#contact">Contact &amp; Location</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Sports Categories</h4>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem;">
+            <li>Football Kits &amp; Cleats</li>
+            <li>Basketball Uniforms</li>
+            <li>Athletics &amp; Running Sneakers</li>
+            <li>Gym Compression &amp; Sweatsuits</li>
+            <li>Swimming &amp; Accessories</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Location &amp; Hours</h4>
+          <p><i class="fas fa-map-marker-alt"></i> <span id="footerLocation">Chuka Town &amp; Nairobi, Kenya</span></p>
+          <p><i class="fas fa-clock"></i> <span id="footerHours">Mon - Sat: 8:00 AM - 7:00 PM</span></p>
+          <p><i class="fas fa-truck"></i> <span id="footerDelivery">Countrywide Delivery (47 Counties)</span></p>
+          <p><i class="fas fa-phone-alt"></i> <span id="footerPhone">0720 357 085</span></p>
+          <p><i class="fas fa-envelope"></i> <span id="footerEmail">dravtechcompany@gmail.com</span></p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p id="footerCopyright">&copy; 2026 DravSports Wears. All Rights Reserved. Chuka Town &amp; Nairobi, Kenya.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

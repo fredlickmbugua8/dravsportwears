@@ -1,0 +1,63 @@
+[
+  {
+    "id": "prod_1791290317782",
+    "title": "short sport wears",
+    "category": "football",
+    "price": 1000,
+    "sizes": [
+      "xl",
+      "xxl"
+    ],
+    "image": "/uploads/short_sport_wears_1791290317720.jpeg",
+    "description": "High performance sportswear item from DravSports Wears.",
+    "createdAt": 1791290317782
+  },
+  {
+    "id": "prod_1",
+    "title": "Nike Dri-FIT Pro Football Kit 2026",
+    "category": "football",
+    "price": 2800,
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "image": "images/football_kit.png",
+    "description": "Breathable, lightweight football jersey & shorts set.",
+    "createdAt": 1791289003315
+  },
+  {
+    "id": "prod_2",
+    "title": "ZoomX Marathon Running Sneakers",
+    "category": "athletics",
+    "price": 4500,
+    "sizes": [
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45"
+    ],
+    "image": "images/running_sneakers.png",
+    "description": "High-bounce carbon plate running sneakers.",
+    "createdAt": 1791289103315
+  },
+  {
+    "id": "prod_3",
+    "title": "Elite Compression Gym Set (Top + Tights)",
+    "category": "gym",
+    "price": 3200,
+    "sizes": [
+      "M",
+      "L",
+      "XL"
+    ],
+    "image": "images/gym_wear.png",
+    "description": "Ergonomic athletic compression fit for workouts.",
+    "createdAt": 1791289203315
+  }
+]

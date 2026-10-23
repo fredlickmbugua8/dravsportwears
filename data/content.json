@@ -1,0 +1,133 @@
+{
+  "brand": {
+    "namePrefix": "DRAV",
+    "nameSuffix": "SPORTS"
+  },
+  "contact": {
+    "phone": "0720357085",
+    "phoneSecondary": "",
+    "whatsapp": "254720357085",
+    "email": "dravtechcompany@gmail.com",
+    "emailSecondary": ""
+  },
+  "hero": {
+    "locationPill": "Chuka Town & Nairobi Branches • Delivery Countrywide 🇰🇪",
+    "titlePrefix": "ELEVATE YOUR GAME WITH",
+    "titleHighlight": "PREMIUM SPORTSWEAR",
+    "description": "Discover original, high-performance athletic apparel, football kits, running sneakers, gym compression wear, and sports gear. Fast doorstep & courier delivery across all 47 counties in Kenya!",
+    "primaryCta": "Explore Sports Catalog",
+    "whatsappCta": "Chat on WhatsApp",
+    "stats": [
+      {
+        "value": "100+",
+        "label": "Sports Gear Uploads"
+      },
+      {
+        "value": "47",
+        "label": "Counties Delivery"
+      },
+      {
+        "value": "2",
+        "label": "Branches: Chuka & Nairobi"
+      }
+    ]
+  },
+  "about": {
+    "tag": "About DravSports Wears",
+    "title": "Your Premier Sports Partner in Tharaka Nithi, Nairobi & Countrywide Kenya",
+    "paragraphs": [
+      "Founded and operating from our branches in Chuka Town and Nairobi, DravSports Wears is committed to providing athletes, local teams, fitness enthusiasts, and sports lovers with top-tier athletic wear at affordable prices.",
+      "Whether you need custom team jerseys, high-cushion running sneakers for training, compression tights for the gym, or swimming accessories, we deliver directly to your doorstep anywhere in Kenya through trusted courier and parcel networks."
+    ],
+    "features": [
+      {
+        "icon": "fas fa-truck-fast",
+        "title": "Countrywide Delivery",
+        "text": "Express dispatch from Chuka and Nairobi to all 47 counties."
+      },
+      {
+        "icon": "fas fa-shield-alt",
+        "title": "Verified Quality",
+        "text": "Original durable fabrics, breathable moisture-wicking technology."
+      },
+      {
+        "icon": "fab fa-whatsapp",
+        "title": "Instant WhatsApp Orders",
+        "text": "Direct contact with our team for quick size confirmations and fast dispatch."
+      },
+      {
+        "icon": "fas fa-tags",
+        "title": "Transparent Prices",
+        "text": "All prices listed clearly with zero hidden costs."
+      }
+    ]
+  },
+  "team": {
+    "tag": "Meet Our Staff",
+    "title": "The Dedicated Team Behind DravSports",
+    "subtitle": "Passionate sports enthusiasts delivering excellence from Chuka Town and Nairobi to your doorstep.",
+    "members": [
+      {
+        "name": "Fredrick Mbugua",
+        "role": "Founder & CEO",
+        "location": "Nairobi & Chuka Town",
+        "image": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=500&auto=format&fit=crop&q=80"
+      },
+      {
+        "name": "Derrick Mutembei",
+        "role": "General Manager, Chuka Branch",
+        "location": "Chuka Town, Tharaka Nithi",
+        "image": "images/team_derrick.png"
+      },
+      {
+        "name": "Ann Kageni",
+        "role": "Operations & Sales Lead",
+        "location": "Chuka Town, Tharaka Nithi",
+        "image": "images/team_ann.png"
+      },
+      {
+        "name": "Victor Mwenda",
+        "role": "Head of Logistics & Delivery",
+        "location": "Countrywide Operations",
+        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80"
+      },
+      {
+        "name": "Dennis Njeru",
+        "role": "Sports Apparel Procurement",
+        "location": "Nairobi Branch",
+        "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=80"
+      }
+    ]
+  },
+  "branches": {
+    "tag": "Our Branches",
+    "title": "Visit Us At Either Branch",
+    "subtitle": "Two convenient locations in Kenya. Walk in, or order online and we deliver countrywide.",
+    "items": [
+      {
+        "name": "Chuka Town Branch",
+        "address": "Commercial Center Near University Gate 1, Chuka Town, Tharaka Nithi County, Kenya.",
+        "phone": "0720357085",
+        "hours": "Mon - Sat: 8:00 AM - 7:00 PM"
+      },
+      {
+        "name": "Nairobi Branch",
+        "address": "Nairobi, Kenya.",
+        "phone": "0720357085",
+        "hours": "Mon - Sat: 8:00 AM - 7:00 PM"
+      }
+    ]
+  },
+  "contactSection": {
+    "tag": "Get In Touch",
+    "title": "Contact & Location Info",
+    "subtitle": "Reach out directly or connect with us on WhatsApp for fast order verification and delivery countrywide.",
+    "address": "Chuka Town, Commercial Center Near University Gate 1, Tharaka Nithi County & Nairobi, Kenya.",
+    "storeHours": "Mon - Sat: 8:00 AM - 7:00 PM",
+    "deliveryNote": "Countrywide Delivery (47 Counties)"
+  },
+  "footer": {
+    "description": "Your premier sportswear platform with branches in Chuka Town and Nairobi. Quality sports gear delivered nationwide across Kenya.",
+    "copyright": "© 2026 DravSports Wears. All Rights Reserved. Chuka Town & Nairobi, Kenya."
+  }
+}

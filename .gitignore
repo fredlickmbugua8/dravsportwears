@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Visitor tracking data (contains IP addresses and user agents - privacy sensitive)
+data/analytics.json
+
+# Environment variables
+.env
+.env.local
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor files
+.vscode/
+.idea/
+
+# Vercel
+.vercel

@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DravSports Wears - Backend Admin Portal & Analytics Dashboard</title>
+  <meta name="description" content="DravSports Admin Control Panel - Visitor Analytics, Website Traffic, Image Uploads, and Sportswear Product Management.">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  
+  <style>
+    /* Admin Specific Styling Extensions */
+    .admin-wrapper {
+      display: flex;
+      min-height: 100vh;
+      background: #080c14;
+    }
+
+    .sidebar {
+      width: 260px;
+      background: #0e1422;
+      border-right: 1px solid var(--border-color);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.85rem 1.1rem;
+      border-radius: var(--radius-md);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .sidebar-link:hover, .sidebar-link.active {
+      background: var(--accent-glow);
+      color: var(--accent-primary);
+      border-left: 4px solid var(--accent-primary);
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .metric-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--accent-primary);
+    }
+
+    .metric-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: var(--accent-glow);
+      color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .metric-val {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--text-main);
+    }
+
+    .metric-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .admin-panel {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .admin-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chart-container {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 1.5rem;
+      height: 220px;
+      padding-top: 2rem;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .bar-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .bar-fill {
+      width: 100%;
+      max-width: 45px;
+      background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: 6px 6px 0 0;
+      transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .bar-fill:hover {
+      filter: brightness(1.2);
+    }
+
+    .bar-value {
+      position: absolute;
+      top: -25px;
+      width: 100%;
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--accent-primary);
+    }
+
+    .bar-label {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .table-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .custom-table th {
+      padding: 0.85rem 1rem;
+      background: var(--bg-main);
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .custom-table td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .dropzone-box {
+      border: 2px dashed var(--accent-primary);
+      background: rgba(0, 230, 118, 0.04);
+      border-radius: var(--radius-lg);
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .dropzone-box:hover {
+      background: var(--accent-glow);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <a href="index.html" class="logo-brand" style="margin-bottom: 1rem;">
+        <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
+        <div>DRAV<span class="logo-highlight">ADMIN</span></div>
+      </a>
+
+      <ul class="sidebar-menu">
+        <li class="sidebar-link active" onclick="switchAdminTab('analyticsPanel', this)">
+          <i class="fas fa-chart-bar"></i> Visitor Analytics
+        </li>
+        <li class="sidebar-link" onclick="switchAdminTab('uploadPanel', this)">
+          <i class="fas fa-cloud-upload-alt"></i> Easy Image Upload
+        </li>
+        <li class="sidebar-link" onclick="switchAdminTab('productsPanel', this)">
+          <i class="fas fa-box-open"></i> Manage Products
+        </li>
+        <li class="sidebar-link" onclick="switchAdminTab('contentPanel', this)">
+          <i class="fas fa-pen-to-square"></i> Website Content
+        </li>
+        <li class="sidebar-link" onclick="switchAdminTab('ordersPanel', this)">
+          <i class="fas fa-shopping-basket"></i> Customer Orders
+        </li>
+        <li class="sidebar-link" onclick="window.location.href='index.html'">
+          <i class="fas fa-external-link-alt"></i> Back to Storefront
+        </li>
+      </ul>
+
+      <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-muted);">
+        <i class="fas fa-map-marker-alt" style="color: var(--accent-primary)"></i> Store: Chuka Town, Tharaka Nithi
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <div class="admin-header">
+        <div>
+          <h1 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800;">
+            Backend Control Panel & Analytics
+          </h1>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Real-time website traffic logs, daily visits counter, and easy sportswear image upload manager.
+          </p>
+        </div>
+
+        <button class="btn-primary" onclick="loadBackendData()">
+          <i class="fas fa-sync-alt"></i> Refresh Data
+        </button>
+      </div>
+
+      <!-- Top Summary Metrics Cards -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fas fa-eye"></i></div>
+          <div>
+            <div class="metric-val" id="metricTodayVisits">0</div>
+            <div class="metric-label">Visits Today</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fas fa-users"></i></div>
+          <div>
+            <div class="metric-val" id="metricTotalVisits">0</div>
+            <div class="metric-label">Total Website Visits</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fas fa-user-check"></i></div>
+          <div>
+            <div class="metric-val" id="metricUniqueVisitors">0</div>
+            <div class="metric-label">Unique Visitors</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fas fa-tshirt"></i></div>
+          <div>
+            <div class="metric-val" id="metricTotalProducts">0</div>
+            <div class="metric-label">Active Sportswear Items</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL 1: WEBSITE ANALYSIS & VISITOR STATS -->
+      <section class="admin-panel active" id="analyticsPanel">
+        <div class="chart-container">
+          <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">
+            <i class="fas fa-chart-line" style="color: var(--accent-primary)"></i> Daily Website Visits Analysis
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
+            Tracks how many visitors access your DravSports Wears website per day.
+          </p>
+
+          <div class="bar-chart" id="dailyVisitsChart">
+            <!-- Dynamic Bar Chart Items Injected -->
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+          <!-- Location Breakdown Card -->
+          <div class="table-card">
+            <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;">
+              <i class="fas fa-map-marked-alt" style="color: var(--accent-secondary)"></i> Visitors Location Breakdown
+            </h3>
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Location / Town</th>
+                  <th>Visits</th>
+                  <th>Share</th>
+                </tr>
+              </thead>
+              <tbody id="locationStatsTable">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Page Views Breakdown -->
+          <div class="table-card">
+            <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;">
+              <i class="fas fa-globe" style="color: var(--accent-primary)"></i> Popular Store Pages
+            </h3>
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Page Path</th>
+                  <th>Traffic Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>/ (Storefront Home)</code></td>
+                  <td><span style="color: var(--success); font-weight: 700;">85% High Traffic</span></td>
+                </tr>
+                <tr>
+                  <td><code>/#catalog (Sports Catalog)</code></td>
+                  <td><span style="color: var(--accent-primary); font-weight: 700;">68% High Interest</span></td>
+                </tr>
+                <tr>
+                  <td><code>/#about (About & Chuka Info)</code></td>
+                  <td><span style="color: var(--accent-secondary); font-weight: 700;">42% Views</span></td>
+                </tr>
+                <tr>
+                  <td><code>/#contact (WhatsApp & Phone)</code></td>
+                  <td><span style="color: var(--warning); font-weight: 700;">35% Conversions</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Visitor Log Table (Who visited my website) -->
+        <div class="table-card">
+          <h3 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem;">
+            <i class="fas fa-history" style="color: var(--accent-primary)"></i> Live Visitor Activity Log (Who Visited)
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+            Detailed timestamped log of recent visitors, IP addresses, location towns, and device types.
+          </p>
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>IP Address</th>
+                <th>Estimated Town</th>
+                <th>Device Type</th>
+                <th>Page Visited</th>
+              </tr>
+            </thead>
+            <tbody id="visitorsLogTable">
+              <!-- Injected via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PANEL 2: EASY IMAGE UPLOAD SECTION -->
+      <section class="admin-panel" id="uploadPanel">
+        <div class="table-card" style="margin-bottom: 2rem;">
+          <h3 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">
+            <i class="fas fa-cloud-upload-alt" style="color: var(--accent-primary)"></i> Easy Image Upload Center
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+            Easily upload high resolution images for sportswear, jerseys, shoes, and gym gear. Uploaded images generate a direct URL you can attach to any product.
+          </p>
+
+          <input type="file" id="adminImageFileInput" accept="image/*" style="display: none;">
+          <div class="dropzone-box" onclick="document.getElementById('adminImageFileInput').click();">
+            <i class="fas fa-file-image" style="font-size: 3.5rem; color: var(--accent-primary); margin-bottom: 1rem; display: block;"></i>
+            <h4 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Click to Drag & Drop / Select Sportswear Image</h4>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Supports PNG, JPG, JPEG, WebP images</p>
+          </div>
+
+          <!-- Upload Status & Preview Result -->
+          <div id="uploadResultCard" style="display: none; margin-top: 1.5rem; padding: 1.25rem; background: var(--bg-main); border-radius: var(--radius-md); border: 1px solid var(--border-highlight);">
+            <div style="display: flex; gap: 1.5rem; align-items: center;">
+              <img id="uploadPreviewThumb" src="" alt="Uploaded Image" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+              <div style="flex: 1;">
+                <h4 style="color: var(--success); font-weight: 700;"><i class="fas fa-check-circle"></i> Image Uploaded Successfully!</h4>
+                <div style="margin: 0.5rem 0;">
+                  <strong style="font-size: 0.85rem; color: var(--text-muted);">Generated URL:</strong>
+                  <input type="text" id="uploadedImageUrlInput" class="form-control" style="font-family: monospace; font-size: 0.85rem;" readonly>
+                </div>
+                <button class="btn-primary" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;" onclick="copyImageURL()">
+                  <i class="fas fa-copy"></i> Copy Image URL
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Attach to New Sportswear Product -->
+        <div class="table-card">
+          <h3 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem;">
+            <i class="fas fa-plus-circle" style="color: var(--accent-primary)"></i> Publish New Sportswear Wear Item
+          </h3>
+
+          <form id="adminAddProductForm">
+            <div class="form-group">
+              <label>Sportswear Title *</label>
+              <input type="text" class="form-control" id="adminTitle" placeholder="e.g. Nike Dri-FIT Jersey Kit" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Sport Category *</label>
+                <select class="form-control" id="adminCategory" required>
+                  <option value="football">Football / Soccer</option>
+                  <option value="basketball">Basketball</option>
+                  <option value="athletics">Athletics & Running</option>
+                  <option value="gym">Gym & Fitness</option>
+                  <option value="swimming">Swimming</option>
+                  <option value="rugby">Rugby</option>
+                  <option value="accessories">Accessories</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Price in Kenya Shillings (KSh) *</label>
+                <input type="number" class="form-control" id="adminPrice" placeholder="e.g. 2800" min="1" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Available Sizes</label>
+              <input type="text" class="form-control" id="adminSizes" placeholder="e.g. S, M, L, XL or 40, 41, 42, 43">
+            </div>
+
+            <div class="form-group">
+              <label>Image Source / URL *</label>
+              <input type="text" class="form-control" id="adminImageUrl" placeholder="Uploaded image URL or path" required>
+            </div>
+
+            <div class="form-group">
+              <label>Item Description</label>
+              <textarea class="form-control" id="adminDescription" rows="3" placeholder="Fabric features, breathability, sizing guidance..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
+              <i class="fas fa-paper-plane"></i> Save & Display On Storefront
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- PANEL 3: MANAGE PRODUCTS CATALOG -->
+      <section class="admin-panel" id="productsPanel">
+        <div class="table-card">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+            <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800;">
+              <i class="fas fa-boxes" style="color: var(--accent-primary)"></i> Sportswear Catalog Management
+            </h3>
+            <button class="btn-primary" onclick="switchAdminTab('uploadPanel', document.querySelectorAll('.sidebar-link')[1])">
+              <i class="fas fa-plus"></i> Upload New Item
+            </button>
+          </div>
+
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Price (KSh)</th>
+                <th>Sizes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminProductsTable">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PANEL 4: CUSTOMER ORDERS BUCKET -->
+      <section class="admin-panel" id="ordersPanel">
+        <div class="table-card">
+          <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">
+            <i class="fas fa-shopping-basket" style="color: var(--accent-primary)"></i> Customer Order Buckets Log
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
+            List of customer order buckets submitted via the website.
+          </p>
+
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Delivery Location</th>
+                <th>Total (KSh)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="adminOrdersTable">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PANEL 5: WEBSITE CONTENT EDITOR -->
+      <section class="admin-panel" id="contentPanel">
+        <div class="table-card" style="margin-bottom: 1.5rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+            <div>
+              <h3 style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; margin-bottom: 0.4rem;">
+                <i class="fas fa-pen-to-square" style="color: var(--accent-primary)"></i> Edit Website Content
+              </h3>
+              <p style="color: var(--text-muted); font-size: 0.88rem;">
+                Everything here feeds the live storefront — hero, about, team, branches, contact details and footer. No section is hard-coded.
+              </p>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+              <button class="btn-outline" onclick="resetWebsiteContent()"><i class="fas fa-rotate-left"></i> Reset Defaults</button>
+              <button class="btn-primary" onclick="saveWebsiteContent()"><i class="fas fa-floppy-disk"></i> Save Changes</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="contentEditor">
+          <!-- Rendered via JavaScript -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Admin Panel Logic
+    document.addEventListener('DOMContentLoaded', () => {
+      loadBackendData();
+      setupUploadHandlers();
+      loadContentEditor();
+    });
+
+    function switchAdminTab(panelId, element) {
+      document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+
+      const target = document.getElementById(panelId);
+      if (target) target.classList.add('active');
+      if (element) element.classList.add('active');
+    }
+
+    async function loadBackendData() {
+      try {
+        const res = await fetch('/api/analytics');
+        const data = await res.json();
+
+        // Update metric cards
+        document.getElementById('metricTodayVisits').textContent = data.todayVisits || 0;
+        document.getElementById('metricTotalVisits').textContent = data.totalVisits || 0;
+        document.getElementById('metricUniqueVisitors').textContent = data.uniqueVisitors || 0;
+        document.getElementById('metricTotalProducts').textContent = data.totalProducts || 0;
+
+        // Render Bar Chart
+        renderDailyVisitsChart(data.dailyVisits || {});
+
+        // Render Location Breakdown
+        renderLocationTable(data.locationStats || {});
+
+        // Render Visitors Log
+        renderVisitorsLog(data.visitorsLog || []);
+
+        // Load Products Table
+        loadAdminProducts();
+
+        // Load Orders Table
+        loadAdminOrders();
+
+      } catch (err) {
+        console.error('Failed to load backend data:', err);
+      }
+    }
+
+    function renderDailyVisitsChart(dailyVisits) {
+      const chartEl = document.getElementById('dailyVisitsChart');
+      if (!chartEl) return;
+
+      const keys = Object.keys(dailyVisits).slice(-7);
+      if (keys.length === 0) {
+        chartEl.innerHTML = '<p style="color: var(--text-muted)">No visit data recorded yet today.</p>';
+        return;
+      }
+
+      const maxVal = Math.max(...Object.values(dailyVisits), 10);
+
+      chartEl.innerHTML = keys.map(dateKey => {
+        const val = dailyVisits[dateKey] || 0;
+        const heightPercent = Math.max((val / maxVal) * 100, 10);
+        const dayLabel = dateKey.split('-').slice(1).join('/');
+
+        return `
+          <div class="bar-group">
+            <div class="bar-fill" style="height: ${heightPercent}%;">
+              <span class="bar-value">${val}</span>
+            </div>
+            <span class="bar-label">${dayLabel}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderLocationTable(stats) {
+      const tbody = document.getElementById('locationStatsTable');
+      if (!tbody) return;
+
+      const total = Object.values(stats).reduce((a, b) => a + b, 0) || 1;
+      const entries = Object.entries(stats);
+
+      if (entries.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3">No location data yet.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = entries.map(([loc, count]) => {
+        const percent = Math.round((count / total) * 100);
+        return `
+          <tr>
+            <td><strong>${loc}</strong></td>
+            <td>${count} visits</td>
+            <td><span class="sport-tag">${percent}%</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderVisitorsLog(logs) {
+      const tbody = document.getElementById('visitorsLogTable');
+      if (!tbody) return;
+
+      if (logs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">No visitor logs recorded.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = logs.map(log => {
+        const timeFormatted = new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `
+          <tr>
+            <td>${timeFormatted}</td>
+            <td><code>${log.ip}</code></td>
+            <td><span style="color: var(--accent-primary); font-weight: 700;">${log.location}</span></td>
+            <td>${log.device}</td>
+            <td><code>${log.page}</code></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Image Upload Handlers
+    function setupUploadHandlers() {
+      const fileInput = document.getElementById('adminImageFileInput');
+      if (!fileInput) return;
+
+      fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async function (evt) {
+          const base64 = evt.target.result;
+          
+          try {
+            const res = await fetch('/api/upload', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ imageBase64: base64, filename: file.name })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+              document.getElementById('uploadResultCard').style.display = 'block';
+              document.getElementById('uploadPreviewThumb').src = data.imageUrl;
+              document.getElementById('uploadedImageUrlInput').value = window.location.origin + data.imageUrl;
+              document.getElementById('adminImageUrl').value = data.imageUrl;
+              alert('Image uploaded successfully! Attached to new item form.');
+            }
+          } catch (err) {
+            alert('Image upload failed.');
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Admin Add Product Form Submission
+      const form = document.getElementById('adminAddProductForm');
+      if (form) {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const payload = {
+            title: document.getElementById('adminTitle').value,
+            category: document.getElementById('adminCategory').value,
+            price: Number(document.getElementById('adminPrice').value),
+            sizes: document.getElementById('adminSizes').value,
+            image: document.getElementById('adminImageUrl').value,
+            description: document.getElementById('adminDescription').value
+          };
+
+          try {
+            const res = await fetch('/api/products', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            if (data.success) {
+              alert('New sportswear published successfully to storefront!');
+              form.reset();
+              loadBackendData();
+            }
+          } catch (err) {
+            alert('Failed to publish product.');
+          }
+        });
+      }
+    }
+
+    function copyImageURL() {
+      const input = document.getElementById('uploadedImageUrlInput');
+      input.select();
+      document.execCommand('copy');
+      alert('Image URL copied to clipboard!');
+    }
+
+    // Load Admin Products Table
+    async function loadAdminProducts() {
+      const tbody = document.getElementById('adminProductsTable');
+      if (!tbody) return;
+
+      try {
+        const res = await fetch('/api/products');
+        const products = await res.json();
+
+        if (products.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6">No products found.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = products.map(item => `
+          <tr>
+            <td>
+              <img src="${item.image}" alt="${item.title}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;" onerror="this.src='images/football_kit.png';">
+            </td>
+            <td><strong>${item.title}</strong></td>
+            <td><span class="sport-tag">⚡ ${item.category}</span></td>
+            <td><strong style="color: var(--accent-primary);">KSh ${item.price.toLocaleString()}</strong></td>
+            <td>${Array.isArray(item.sizes) ? item.sizes.join(', ') : item.sizes}</td>
+            <td>
+              <button class="action-btn" title="Delete Product" onclick="deleteBackendProduct('${item.id}')">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        console.error('Failed to load products table:', e);
+      }
+    }
+
+    async function deleteBackendProduct(id) {
+      if (confirm('Delete this product from store?')) {
+        await fetch(`/api/products/${id}`, { method: 'DELETE' });
+        loadAdminProducts();
+      }
+    }
+
+    // Load Customer Orders Table
+    async function loadAdminOrders() {
+      const tbody = document.getElementById('adminOrdersTable');
+      if (!tbody) return;
+
+      try {
+        const res = await fetch('/api/orders');
+        const orders = await res.json();
+
+        if (orders.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                No customer orders received yet. Customer orders placed on website appear here.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = orders.map(ord => `
+          <tr>
+            <td><code>${ord.id}</code></td>
+            <td><strong>${ord.customerName || 'Customer'}</strong></td>
+            <td>${ord.customerPhone || 'N/A'}</td>
+            <td>${ord.customerLocation || 'Chuka Town'}</td>
+            <td><strong style="color: var(--accent-primary);">KSh ${(ord.total || 0).toLocaleString()}</strong></td>
+            <td><span class="sport-tag">${ord.status || 'Pending'}</span></td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        console.error('Failed to load orders:', e);
+      }
+    }
+
+    /* ======================================================================
+       WEBSITE CONTENT EDITOR
+       Every storefront section is driven by GET /api/content. The schema
+       below describes the editable fields, and these helpers build the forms,
+       track changes and save them back with PUT /api/content.
+       ====================================================================== */
+
+    const CONTENT_SCHEMA = [
+      {
+        key: 'brand', label: 'Brand Name', icon: 'fas fa-tag',
+        fields: [
+          { name: 'namePrefix', label: 'Brand First Word', type: 'text' },
+          { name: 'nameSuffix', label: 'Brand Second Word', type: 'text' }
+        ]
+      },
+      {
+        key: 'contact', label: 'Contact Details', icon: 'fas fa-address-book',
+        fields: [
+          { name: 'phone', label: 'Primary Phone (displayed)', type: 'text' },
+          { name: 'phoneSecondary', label: 'Secondary Phone (optional)', type: 'text' },
+          { name: 'whatsapp', label: 'WhatsApp Number (international, e.g. 254720357085)', type: 'text' },
+          { name: 'email', label: 'Primary Email', type: 'text' },
+          { name: 'emailSecondary', label: 'Secondary Email (optional)', type: 'text' }
+        ]
+      },
+      {
+        key: 'hero', label: 'Hero Section', icon: 'fas fa-star',
+        fields: [
+          { name: 'locationPill', label: 'Location Pill Text', type: 'text' },
+          { name: 'titlePrefix', label: 'Headline (first part)', type: 'text' },
+          { name: 'titleHighlight', label: 'Headline (highlighted part)', type: 'text' },
+          { name: 'description', label: 'Hero Description', type: 'textarea' },
+          { name: 'primaryCta', label: 'Primary Button Text', type: 'text' },
+          { name: 'whatsappCta', label: 'WhatsApp Button Text', type: 'text' },
+          {
+            name: 'stats', label: 'Hero Statistics', type: 'list',
+            itemFields: [{ name: 'value', label: 'Value' }, { name: 'label', label: 'Label' }]
+          }
+        ]
+      },
+      {
+        key: 'about', label: 'About Section', icon: 'fas fa-circle-info',
+        fields: [
+          { name: 'tag', label: 'Section Tag', type: 'text' },
+          { name: 'title', label: 'Section Title', type: 'text' },
+          { name: 'paragraphs', label: 'Paragraphs (one per line)', type: 'lines' },
+          {
+            name: 'features', label: 'Feature Cards', type: 'list',
+            itemFields: [
+              { name: 'icon', label: 'FontAwesome Class (e.g. fas fa-truck-fast)' },
+              { name: 'title', label: 'Title' },
+              { name: 'text', label: 'Text' }
+            ]
+          }
+        ]
+      },
+      {
+        key: 'team', label: 'Team Section', icon: 'fas fa-users',
+        fields: [
+          { name: 'tag', label: 'Section Tag', type: 'text' },
+          { name: 'title', label: 'Section Title', type: 'text' },
+          { name: 'subtitle', label: 'Section Subtitle', type: 'text' },
+          {
+            name: 'members', label: 'Team Members', type: 'list',
+            itemFields: [
+              { name: 'name', label: 'Full Name' },
+              { name: 'role', label: 'Role / Position' },
+              { name: 'location', label: 'Location' },
+              { name: 'image', label: 'Image URL' }
+            ]
+          }
+        ]
+      },
+      {
+        key: 'branches', label: 'Branches Section', icon: 'fas fa-store',
+        fields: [
+          { name: 'tag', label: 'Section Tag', type: 'text' },
+          { name: 'title', label: 'Section Title', type: 'text' },
+          { name: 'subtitle', label: 'Section Subtitle', type: 'text' },
+          {
+            name: 'items', label: 'Branches', type: 'list',
+            itemFields: [
+              { name: 'name', label: 'Branch Name' },
+              { name: 'address', label: 'Address' },
+              { name: 'phone', label: 'Phone' },
+              { name: 'hours', label: 'Opening Hours' }
+            ]
+          }
+        ]
+      },
+      {
+        key: 'contactSection', label: 'Contact Section', icon: 'fas fa-location-dot',
+        fields: [
+          { name: 'tag', label: 'Section Tag', type: 'text' },
+          { name: 'title', label: 'Section Title', type: 'text' },
+          { name: 'subtitle', label: 'Section Subtitle', type: 'text' },
+          { name: 'address', label: 'Address Line', type: 'textarea' },
+          { name: 'storeHours', label: 'Store Hours', type: 'text' },
+          { name: 'deliveryNote', label: 'Delivery Note', type: 'text' }
+        ]
+      },
+      {
+        key: 'footer', label: 'Footer', icon: 'fas fa-shoe-prints',
+        fields: [
+          { name: 'description', label: 'Footer Description', type: 'textarea' },
+          { name: 'copyright', label: 'Copyright Line', type: 'text' }
+        ]
+      }
+    ];
+
+    let siteContentDraft = null;
+
+    function escAttr(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    async function loadContentEditor() {
+      try {
+        const res = await fetch('/api/content');
+        siteContentDraft = await res.json();
+        renderContentEditor();
+      } catch (err) {
+        console.error('Failed to load website content:', err);
+      }
+    }
+
+    function renderContentEditor() {
+      const host = document.getElementById('contentEditor');
+      if (!host || !siteContentDraft) return;
+
+      host.innerHTML = CONTENT_SCHEMA.map(section => `
+        <div class="table-card" style="margin-bottom: 1.5rem;">
+          <h3 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 800; margin-bottom: 1.25rem;">
+            <i class="${section.icon}" style="color: var(--accent-primary)"></i> ${section.label}
+          </h3>
+          ${section.fields.map(field => renderContentField(section.key, field)).join('')}
+        </div>
+      `).join('');
+    }
+
+    function renderContentField(sectionKey, field) {
+      const value = siteContentDraft[sectionKey] ? siteContentDraft[sectionKey][field.name] : undefined;
+
+      if (field.type === 'list') {
+        const items = Array.isArray(value) ? value : [];
+        return `
+          <div class="form-group">
+            <label>${field.label}</label>
+            ${items.map((item, idx) => renderContentListItem(sectionKey, field, item, idx)).join('')}
+            <button type="button" class="btn-outline" onclick="addContentListItem('${sectionKey}', '${field.name}')">
+              <i class="fas fa-plus"></i> Add New
+            </button>
+          </div>
+        `;
+      }
+
+      if (field.type === 'lines') {
+        const text = Array.isArray(value) ? value.join('\n') : '';
+        return `
+          <div class="form-group">
+            <label>${field.label}</label>
+            <textarea class="form-control" rows="4"
+              oninput="setContentValue('${sectionKey}', '${field.name}', this.value, null, 'lines', null)">${escAttr(text)}</textarea>
+          </div>
+        `;
+      }
+
+      if (field.type === 'textarea') {
+        return `
+          <div class="form-group">
+            <label>${field.label}</label>
+            <textarea class="form-control" rows="3"
+              oninput="setContentValue('${sectionKey}', '${field.name}', this.value, null, null, null)">${escAttr(value)}</textarea>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="form-group">
+          <label>${field.label}</label>
+          <input type="text" class="form-control" value="${escAttr(value)}"
+            oninput="setContentValue('${sectionKey}', '${field.name}', this.value, null, null, null)">
+        </div>
+      `;
+    }
+
+    function renderContentListItem(sectionKey, field, item, idx) {
+      return `
+        <div style="padding: 1rem; margin-bottom: 0.75rem; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+            <strong style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">
+              ${field.label.replace(/s$/, '')} #${idx + 1}
+            </strong>
+            <button type="button" class="action-btn" title="Remove"
+              onclick="removeContentListItem('${sectionKey}', '${field.name}', ${idx})">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+          ${field.itemFields.map(sub => `
+            <div class="form-group" style="margin-bottom: 0.6rem;">
+              <label style="font-size: 0.78rem;">${sub.label}</label>
+              <input type="text" class="form-control" value="${escAttr(item[sub.name])}"
+                oninput="setContentValue('${sectionKey}', '${field.name}', this.value, ${idx}, null, '${sub.name}')">
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function setContentValue(sectionKey, fieldName, value, index, mode, prop) {
+      if (!siteContentDraft || !siteContentDraft[sectionKey]) return;
+      const section = siteContentDraft[sectionKey];
+
+      if (mode === 'lines') {
+        section[fieldName] = value.split('\n').map(line => line.trim()).filter(Boolean);
+        return;
+      }
+
+      if (index !== null && index !== undefined) {
+        if (!Array.isArray(section[fieldName])) section[fieldName] = [];
+        if (!section[fieldName][index]) section[fieldName][index] = {};
+        section[fieldName][index][prop] = value;
+        return;
+      }
+
+      section[fieldName] = value;
+    }
+
+    function addContentListItem(sectionKey, fieldName) {
+      const sectionDef = CONTENT_SCHEMA.find(s => s.key === sectionKey);
+      const fieldDef = sectionDef && sectionDef.fields.find(f => f.name === fieldName);
+      if (!fieldDef) return;
+
+      const blank = {};
+      fieldDef.itemFields.forEach(sub => { blank[sub.name] = ''; });
+
+      if (!Array.isArray(siteContentDraft[sectionKey][fieldName])) {
+        siteContentDraft[sectionKey][fieldName] = [];
+      }
+      siteContentDraft[sectionKey][fieldName].push(blank);
+      renderContentEditor();
+    }
+
+    function removeContentListItem(sectionKey, fieldName, index) {
+      if (!siteContentDraft[sectionKey] || !Array.isArray(siteContentDraft[sectionKey][fieldName])) return;
+      siteContentDraft[sectionKey][fieldName].splice(index, 1);
+      renderContentEditor();
+    }
+
+    async function saveWebsiteContent() {
+      if (!siteContentDraft) return;
+
+      try {
+        const res = await fetch('/api/content', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(siteContentDraft)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          siteContentDraft = data.content;
+          renderContentEditor();
+          alert('Website content saved. Reload the storefront to see the changes.');
+        } else {
+          alert('Save failed: ' + (data.error || 'Unknown error'));
+        }
+      } catch (err) {
+        alert('Failed to save website content.');
+      }
+    }
+
+    async function resetWebsiteContent() {
+      if (!confirm('Reset all website text back to the original defaults?')) return;
+
+      try {
+        const res = await fetch('/api/content/reset', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          siteContentDraft = data.content;
+          renderContentEditor();
+          alert('Website content reset to defaults.');
+        }
+      } catch (err) {
+        alert('Failed to reset website content.');
+      }
+    }
+  </script>
+</body>
+</html>
