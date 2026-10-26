@@ -230,15 +230,61 @@ const DEFAULT_CONTENT = {
   footer: {
     description: 'Your premier sportswear platform with branches in Chuka Town and Nairobi. Quality sports gear delivered nationwide across Kenya.',
     copyright: '© 2026 DravSports Wears. All Rights Reserved. Chuka Town & Nairobi, Kenya.'
+  },
+  legal: {
+    consentTitle: 'We value your privacy',
+    consentText: 'We would like to record your IP address, device type and the pages you visit, so we can measure how the store is used. Nothing is recorded unless you accept, and you can change your choice at any time.',
+    acceptLabel: 'Accept All',
+    declineLabel: 'Decline',
+    policyLinkLabel: 'Cookie & Privacy Policy',
+    settingsLabel: 'Cookie Settings',
+    policyTitle: 'Cookie & Privacy Policy',
+    policyUpdated: 'Last updated: 26 October 2026',
+    dataController: 'Data controller: DravSports Wears — Chuka Town & Nairobi, Kenya',
+    policyParagraphs: [
+      'This policy explains what information DravSports Wears collects when you visit this website, why we collect it, and the choices available to you. We are the data controller. We operate in Kenya and handle personal data in line with the Data Protection Act, 2019.',
+      'Information we collect. If you accept analytics, this website records the page you requested, the date and time of your visit, your IP address, and whether you are using a mobile device or a desktop browser. These entries are written to a log on our own server. If you decline, none of this information is recorded.',
+      'Cookies and local storage. We set one cookie named drav_cookie_consent. Its only purpose is to remember whether you accepted or declined analytics, so it is strictly necessary and it is set whichever option you choose. It is kept for 12 months. We do not use advertising, profiling or third-party tracking cookies. Your shopping cart and your light/dark theme preference are stored in your browser\'s local storage rather than in cookies, they stay on your device, and they are never sent to us.',
+      'How we use analytics. Visit information is used solely to count visits and to understand which products and pages are most popular. We do not sell it, rent it, or share it with third parties, and we do not use it to build advertising profiles of you.',
+      'How long we keep it. Analytics entries are stored on our own server and automatically trimmed so that only the 100 most recent entries are retained. Your consent choice is remembered for 12 months.',
+      'Orders placed over WhatsApp or email. When you send an order, your name, phone number and delivery details are handled by the messaging or email provider you chose to use, under their own privacy terms. We use those details only to process and deliver your order.',
+      'Your rights. Under the Data Protection Act, 2019 you have the right to be informed, to access the personal data we hold about you, to have it corrected or deleted, to object to processing, and to withdraw your consent at any time. To exercise any of these rights, contact us on 0720357085 or at dravtechcompany@gmail.com. You also have the right to lodge a complaint with the Office of the Data Protection Commissioner (ODPC) of Kenya.',
+      'Changing your choice. You can reopen this notice and change or withdraw your consent at any time by using the Cookie Settings link in the footer of this website.',
+      'Children. This website is not directed at children, and we do not knowingly collect personal data from children.'
+    ]
   }
 };
 
 // Merge saved content over the defaults so no field is ever missing
 let contentData = deepMerge(DEFAULT_CONTENT, readJSON(CONTENT_FILE, {}));
 
+// Name of the strictly-necessary cookie that stores the visitor's analytics choice
+const CONSENT_COOKIE = 'drav_cookie_consent';
+
+// Read the analytics consent choice from the request cookies.
+// Returns 'granted', 'denied', or null when the visitor has not chosen yet.
+function getConsent(req) {
+  const raw = req.headers.cookie;
+  if (!raw) return null;
+
+  const found = raw.split(';')
+    .map(part => part.trim())
+    .find(part => part.startsWith(CONSENT_COOKIE + '='));
+
+  if (!found) return null;
+
+  const value = decodeURIComponent(found.slice(CONSENT_COOKIE.length + 1));
+  return value === 'granted' || value === 'denied' ? value : null;
+}
+
 // Middleware to track website visits
 app.use((req, res, next) => {
   if (req.path.startsWith('/api') || req.path.match(/\.(css|js|png|jpg|jpeg|gif|ico|svg)$/)) {
+    return next();
+  }
+
+  // No analytics may be recorded until the visitor has explicitly accepted.
+  if (getConsent(req) !== 'granted') {
     return next();
   }
 
@@ -256,24 +302,19 @@ app.use((req, res, next) => {
   analyticsData.dailyVisits[dateStr] += 1;
 
   // Add visitor entry to log (keep last 100)
-  const townLocations = ['Chuka Town', 'Tharaka Nithi', 'Nairobi', 'Meru', 'Embu', 'Mombasa', 'Eldoret'];
-  const simulatedTown = townLocations[Math.floor(Math.random() * townLocations.length)];
-
   analyticsData.visitorsLog.unshift({
     id: 'vis_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
     timestamp: new Date().toISOString(),
     ip: clientIp,
     page: req.path,
     device: userAgent.includes('Mobile') ? 'Mobile Device' : 'Desktop Browser',
-    location: simulatedTown
+    location: 'Not provided'
   });
 
   if (analyticsData.visitorsLog.length > 100) {
     analyticsData.visitorsLog = analyticsData.visitorsLog.slice(0, 100);
   }
 
-  // Update location counters
-  analyticsData.locationStats[simulatedTown] = (analyticsData.locationStats[simulatedTown] || 0) + 1;
   analyticsData.uniqueVisitors = Object.keys(analyticsData.visitorsLog.reduce((acc, log) => {
     acc[log.ip] = true;
     return acc;
@@ -285,14 +326,16 @@ app.use((req, res, next) => {
 
 // API: Record Explicit Visit Ping from Frontend
 app.post('/api/visit', (req, res) => {
-  const { page, location } = req.body;
+  // Refuse to record anything without explicit consent
+  if (getConsent(req) !== 'granted') {
+    return res.json({ success: true, recorded: false, reason: 'no-consent' });
+  }
+
+  const { page } = req.body;
   const dateStr = new Date().toISOString().split('T')[0];
-  
+
   analyticsData.totalVisits += 1;
   analyticsData.dailyVisits[dateStr] = (analyticsData.dailyVisits[dateStr] || 0) + 1;
-
-  const loc = location || 'Chuka Town';
-  analyticsData.locationStats[loc] = (analyticsData.locationStats[loc] || 0) + 1;
 
   analyticsData.visitorsLog.unshift({
     id: 'vis_' + Date.now(),
@@ -300,11 +343,20 @@ app.post('/api/visit', (req, res) => {
     ip: req.ip || '127.0.0.1',
     page: page || '/',
     device: req.headers['user-agent']?.includes('Mobile') ? 'Mobile' : 'Desktop',
-    location: loc
+    location: 'Not provided'
   });
 
+  if (analyticsData.visitorsLog.length > 100) {
+    analyticsData.visitorsLog = analyticsData.visitorsLog.slice(0, 100);
+  }
+
+  analyticsData.uniqueVisitors = Object.keys(analyticsData.visitorsLog.reduce((acc, log) => {
+    acc[log.ip] = true;
+    return acc;
+  }, {})).length;
+
   writeJSON(ANALYTICS_FILE, analyticsData);
-  res.json({ success: true, totalVisits: analyticsData.totalVisits, dailyVisitsToday: analyticsData.dailyVisits[dateStr] });
+  res.json({ success: true, recorded: true, totalVisits: analyticsData.totalVisits, dailyVisitsToday: analyticsData.dailyVisits[dateStr] });
 });
 
 // API: Get Analytics Data (for Backend Dashboard)

@@ -129,5 +129,27 @@
   "footer": {
     "description": "Your premier sportswear platform with branches in Chuka Town and Nairobi. Quality sports gear delivered nationwide across Kenya.",
     "copyright": "© 2026 DravSports Wears. All Rights Reserved. Chuka Town & Nairobi, Kenya."
+  },
+  "legal": {
+    "consentTitle": "We value your privacy",
+    "consentText": "We would like to record your IP address, device type and the pages you visit, so we can measure how the store is used. Nothing is recorded unless you accept, and you can change your choice at any time.",
+    "acceptLabel": "Accept All",
+    "declineLabel": "Decline",
+    "policyLinkLabel": "Cookie & Privacy Policy",
+    "settingsLabel": "Cookie Settings",
+    "policyTitle": "Cookie & Privacy Policy",
+    "policyUpdated": "Last updated: 26 October 2026",
+    "dataController": "Data controller: DravSports Wears — Chuka Town & Nairobi, Kenya",
+    "policyParagraphs": [
+      "This policy explains what information DravSports Wears collects when you visit this website, why we collect it, and the choices available to you. We are the data controller. We operate in Kenya and handle personal data in line with the Data Protection Act, 2019.",
+      "Information we collect. If you accept analytics, this website records the page you requested, the date and time of your visit, your IP address, and whether you are using a mobile device or a desktop browser. These entries are written to a log on our own server. If you decline, none of this information is recorded.",
+      "Cookies and local storage. We set one cookie named drav_cookie_consent. Its only purpose is to remember whether you accepted or declined analytics, so it is strictly necessary and it is set whichever option you choose. It is kept for 12 months. We do not use advertising, profiling or third-party tracking cookies. Your shopping cart and your light/dark theme preference are stored in your browser's local storage rather than in cookies, they stay on your device, and they are never sent to us.",
+      "How we use analytics. Visit information is used solely to count visits and to understand which products and pages are most popular. We do not sell it, rent it, or share it with third parties, and we do not use it to build advertising profiles of you.",
+      "How long we keep it. Analytics entries are stored on our own server and automatically trimmed so that only the 100 most recent entries are retained. Your consent choice is remembered for 12 months.",
+      "Orders placed over WhatsApp or email. When you send an order, your name, phone number and delivery details are handled by the messaging or email provider you chose to use, under their own privacy terms. We use those details only to process and deliver your order.",
+      "Your rights. Under the Data Protection Act, 2019 you have the right to be informed, to access the personal data we hold about you, to have it corrected or deleted, to object to processing, and to withdraw your consent at any time. To exercise any of these rights, contact us on 0720357085 or at dravtechcompany@gmail.com. You also have the right to lodge a complaint with the Office of the Data Protection Commissioner (ODPC) of Kenya.",
+      "Changing your choice. You can reopen this notice and change or withdraw your consent at any time by using the Cookie Settings link in the footer of this website.",
+      "Children. This website is not directed at children, and we do not knowingly collect personal data from children."
+    ]
   }
 }

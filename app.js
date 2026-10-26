@@ -74,7 +74,7 @@ let previewImageBase64 = null;
 let siteContent = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-  recordWebsiteVisit();
+  initCookieConsent();
   loadContent();
   loadProducts();
   loadCart();
@@ -229,6 +229,24 @@ function applyContent() {
     setText('footerLocation', c.branches.items.map(b => b.name.replace(' Branch', '')).join(' & ') + ', Kenya');
   }
 
+  // Cookie consent banner & privacy policy (all editable from the backend)
+  const legal = c.legal || {};
+  setText('cookieBannerTitle', legal.consentTitle);
+  setText('cookieBannerText', legal.consentText);
+  setText('cookieBannerPolicyLink', legal.policyLinkLabel);
+  setText('cookieAcceptBtn', legal.acceptLabel);
+  setText('cookieDeclineBtn', legal.declineLabel);
+  setText('footerPolicyLink', legal.policyLinkLabel);
+  setText('footerCookieSettings', legal.settingsLabel);
+  setText('policyTitle', legal.policyTitle);
+  setText('policyUpdated', legal.policyUpdated);
+  setText('policyController', legal.dataController);
+
+  const policyEl = document.getElementById('policyParagraphs');
+  if (policyEl && Array.isArray(legal.policyParagraphs)) {
+    policyEl.innerHTML = legal.policyParagraphs.map(p => `<p>${esc(p)}</p>`).join('');
+  }
+
   // Point every WhatsApp button/link at the backend number
   document.querySelectorAll('.js-whatsapp-link').forEach(a => {
     a.setAttribute('href', waLink('Hello DravSports Wears, I would like to inquire about your current sportswear uploads.'));
@@ -244,13 +262,81 @@ function updateThemeIcon() {
   icon.className = current === 'light' ? 'fas fa-moon' : 'fas fa-sun';
 }
 
-// Record Website Visit Ping to Backend Analytics
+/* ==========================================================================
+   COOKIE CONSENT & PRIVACY
+   Kenya Data Protection Act, 2019 compliant. No analytics are recorded until
+   the visitor explicitly accepts. The choice is stored in the strictly
+   necessary drav_cookie_consent cookie for 12 months and is re-read by the
+   server on every request, so declining genuinely stops all IP logging.
+   ========================================================================== */
+
+const CONSENT_COOKIE = 'drav_cookie_consent';
+const CONSENT_MAX_AGE = 60 * 60 * 24 * 365; // 12 months (seconds)
+
+function getConsentChoice() {
+  const match = document.cookie
+    .split(';')
+    .map(part => part.trim())
+    .find(part => part.startsWith(CONSENT_COOKIE + '='));
+  if (!match) return null;
+  const value = decodeURIComponent(match.slice(CONSENT_COOKIE.length + 1));
+  return value === 'granted' || value === 'denied' ? value : null;
+}
+
+function setConsentChoice(value) {
+  const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+  document.cookie = `${CONSENT_COOKIE}=${value}; Max-Age=${CONSENT_MAX_AGE}; Path=/; SameSite=Lax${secure}`;
+}
+
+function showConsentBanner() {
+  const banner = document.getElementById('cookieBanner');
+  if (banner) banner.classList.add('active');
+}
+
+function hideConsentBanner() {
+  const banner = document.getElementById('cookieBanner');
+  if (banner) banner.classList.remove('active');
+}
+
+function openPolicyModal() {
+  openModal('policyModal');
+}
+
+function initCookieConsent() {
+  const acceptBtn = document.getElementById('cookieAcceptBtn');
+  const declineBtn = document.getElementById('cookieDeclineBtn');
+
+  if (acceptBtn) {
+    acceptBtn.addEventListener('click', () => {
+      setConsentChoice('granted');
+      hideConsentBanner();
+      recordWebsiteVisit();
+    });
+  }
+
+  if (declineBtn) {
+    declineBtn.addEventListener('click', () => {
+      setConsentChoice('denied');
+      hideConsentBanner();
+    });
+  }
+
+  const choice = getConsentChoice();
+  if (choice === 'granted') {
+    recordWebsiteVisit();
+  } else if (choice === null) {
+    showConsentBanner();
+  }
+}
+
+// Record Website Visit Ping to Backend Analytics (consent gated)
 async function recordWebsiteVisit() {
+  if (getConsentChoice() !== 'granted') return;
   try {
     await fetch('/api/visit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ page: window.location.pathname, location: 'Chuka Town' })
+      body: JSON.stringify({ page: window.location.pathname })
     });
   } catch (err) {
     // Fallback silently if offline

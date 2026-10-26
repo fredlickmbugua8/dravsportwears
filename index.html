@@ -497,9 +497,44 @@
 
       <div class="footer-bottom">
         <p id="footerCopyright">&copy; 2026 DravSports Wears. All Rights Reserved. Chuka Town &amp; Nairobi, Kenya.</p>
+        <p class="footer-legal-links">
+          <a href="#" onclick="openPolicyModal(); return false;" id="footerPolicyLink">Cookie &amp; Privacy Policy</a>
+          <span aria-hidden="true">&bull;</span>
+          <a href="#" onclick="showConsentBanner(); return false;" id="footerCookieSettings">Cookie Settings</a>
+        </p>
       </div>
     </div>
   </footer>
+
+  <!-- Cookie Consent Banner -->
+  <div class="cookie-banner" id="cookieBanner" role="dialog" aria-live="polite" aria-label="Cookie consent">
+    <div class="cookie-banner-inner">
+      <div class="cookie-banner-text">
+        <h4 id="cookieBannerTitle">We value your privacy</h4>
+        <p id="cookieBannerText">
+          We would like to record your IP address, device type and the pages you visit, so we can measure how the store is used. Nothing is recorded unless you accept, and you can change your choice at any time.
+        </p>
+        <a href="#" class="cookie-policy-link" onclick="openPolicyModal(); return false;" id="cookieBannerPolicyLink">Cookie &amp; Privacy Policy</a>
+      </div>
+      <div class="cookie-banner-actions">
+        <button type="button" class="cookie-btn cookie-btn-decline" id="cookieDeclineBtn">Decline</button>
+        <button type="button" class="cookie-btn cookie-btn-accept" id="cookieAcceptBtn">Accept All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cookie & Privacy Policy Modal -->
+  <div class="custom-modal policy-modal" id="policyModal">
+    <div class="modal-header">
+      <h3 style="font-family: var(--font-heading); font-size: 1.2rem;" id="policyTitle">Cookie &amp; Privacy Policy</h3>
+      <button class="drawer-close" onclick="closeModal('policyModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <p class="policy-meta" id="policyUpdated">Last updated: 26 October 2026</p>
+    <p class="policy-meta" id="policyController">Data controller: DravSports Wears — Chuka Town &amp; Nairobi, Kenya</p>
+    <div id="policyParagraphs">
+      <!-- Rendered from backend content -->
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
