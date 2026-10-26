@@ -44,11 +44,6 @@
             <i class="fas fa-sun"></i>
           </button>
 
-          <!-- Upload Sportswear Button -->
-          <button class="btn-outline" id="openUploadBtn" style="padding: 0.55rem 1.1rem; font-size: 0.88rem;">
-            <i class="fas fa-cloud-upload-alt"></i> Upload Wear
-          </button>
-
           <!-- Order Bucket / Cart Button -->
           <button class="btn-icon-badge" id="cartBtn" title="View Order Bucket">
             <i class="fas fa-shopping-basket"></i>
@@ -369,71 +364,6 @@
       </button>
     </div>
   </aside>
-
-  <!-- Upload Sportswear Modal -->
-  <div class="custom-modal" id="uploadModal">
-    <div class="modal-header">
-      <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800;">
-        <i class="fas fa-cloud-upload-alt" style="color: var(--accent-primary);"></i> Upload New Sportswear
-      </h3>
-      <button class="drawer-close" id="closeUploadModal"><i class="fas fa-times"></i></button>
-    </div>
-
-    <form id="uploadProductForm">
-      <div class="form-group">
-        <label>Sportswear Title / Name *</label>
-        <input type="text" class="form-control" id="productTitle" placeholder="e.g. Adidas Predator Football Cleats 2026" required>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Sport Category *</label>
-          <select class="form-control" id="productCategory" required>
-            <option value="football">Football / Soccer</option>
-            <option value="basketball">Basketball</option>
-            <option value="athletics">Athletics & Running</option>
-            <option value="gym">Gym & Fitness</option>
-            <option value="swimming">Swimming</option>
-            <option value="rugby">Rugby</option>
-            <option value="accessories">Sports Accessories</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Price in Kenya Shillings (KSh) *</label>
-          <input type="number" class="form-control" id="productPrice" placeholder="e.g. 2500" min="1" required>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Available Sizes (Comma separated)</label>
-        <input type="text" class="form-control" id="productSizes" placeholder="e.g. S, M, L, XL, XXL or 40, 41, 42, 43">
-      </div>
-
-      <div class="form-group">
-        <label>Upload Item Image File</label>
-        <input type="file" id="productImageInput" accept="image/*" style="display: none;">
-        <div class="image-preview-box" id="imagePreviewBox" onclick="document.getElementById('productImageInput').click();">
-          <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--text-muted); margin-bottom: 0.5rem;"></i>
-          <span style="font-size: 0.85rem; color: var(--text-muted);">Click here to select an image from your device</span>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Or Paste Image URL (Optional fallback)</label>
-        <input type="url" class="form-control" id="productImageUrl" placeholder="https://example.com/jersey.jpg">
-      </div>
-
-      <div class="form-group">
-        <label>Item Description & Features</label>
-        <textarea class="form-control" id="productDescription" rows="3" placeholder="Describe fabric quality, fit type, breathability..."></textarea>
-      </div>
-
-      <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem;">
-        <i class="fas fa-check-circle"></i> Save & Publish Upload
-      </button>
-    </form>
-  </div>
 
   <!-- Quick View Modal -->
   <div class="custom-modal" id="quickViewModal">

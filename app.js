@@ -70,7 +70,6 @@ let cart = [];
 let currentCategory = 'all';
 let searchQuery = '';
 let currentSort = 'newest';
-let previewImageBase64 = null;
 let siteContent = null;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -359,10 +358,6 @@ async function loadProducts() {
   renderCatalog();
 }
 
-function saveProducts() {
-  localStorage.setItem('dravsports_products', JSON.stringify(products));
-}
-
 function loadCart() {
   const saved = localStorage.getItem('dravsports_cart');
   cart = saved ? JSON.parse(saved) : [];
@@ -426,37 +421,7 @@ function setupEventListeners() {
   if (modalOverlay) {
     modalOverlay.addEventListener('click', () => {
       closeCartDrawer();
-      closeModal('uploadModal');
       closeModal('quickViewModal');
-    });
-  }
-
-  const openUploadBtn = document.getElementById('openUploadBtn');
-  const closeUploadModal = document.getElementById('closeUploadModal');
-  if (openUploadBtn) openUploadBtn.addEventListener('click', () => openModal('uploadModal'));
-  if (closeUploadModal) closeUploadModal.addEventListener('click', () => closeModal('uploadModal'));
-
-  const productImageInput = document.getElementById('productImageInput');
-  const imagePreviewBox = document.getElementById('imagePreviewBox');
-  if (productImageInput && imagePreviewBox) {
-    productImageInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          previewImageBase64 = evt.target.result;
-          imagePreviewBox.innerHTML = `<img src="${previewImageBase64}" alt="Preview">`;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  }
-
-  const uploadForm = document.getElementById('uploadProductForm');
-  if (uploadForm) {
-    uploadForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      handleProductUpload();
     });
   }
 
@@ -492,10 +457,7 @@ function renderCatalog() {
       <div class="empty-catalog">
         <i class="fas fa-running"></i>
         <h3>No Sportswear Found</h3>
-        <p>Try searching another item or upload new gear!</p>
-        <button class="btn-primary" style="margin-top: 1rem;" onclick="openModal('uploadModal')">
-          <i class="fas fa-plus"></i> Upload Wear Now
-        </button>
+        <p>Try a different search term or browse another category.</p>
       </div>
     `;
     return;
@@ -509,9 +471,6 @@ function renderCatalog() {
         <div class="card-quick-actions">
           <button class="action-btn" title="Quick View" onclick="openQuickView('${item.id}')">
             <i class="fas fa-eye"></i>
-          </button>
-          <button class="action-btn" title="Delete Item" onclick="deleteProduct('${item.id}')">
-            <i class="fas fa-trash-alt"></i>
           </button>
         </div>
       </div>
@@ -676,85 +635,6 @@ async function handleWhatsAppCheckout() {
   const whatsappUrl = waLink(msg);
   window.open(whatsappUrl, '_blank');
   showToast('Connecting to WhatsApp with your order details...');
-}
-
-async function handleProductUpload() {
-  const title = document.getElementById('productTitle').value.trim();
-  const category = document.getElementById('productCategory').value;
-  const price = parseFloat(document.getElementById('productPrice').value);
-  const sizesInput = document.getElementById('productSizes').value.trim();
-  const imageUrlInput = document.getElementById('productImageUrl').value.trim();
-  const description = document.getElementById('productDescription').value.trim();
-
-  if (!title || isNaN(price) || price <= 0) {
-    showToast('Please enter a valid title and price!');
-    return;
-  }
-
-  let imagePath = previewImageBase64 || imageUrlInput || 'images/football_kit.png';
-
-  // If base64 image uploaded, send to Express Backend /api/upload
-  if (previewImageBase64) {
-    try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageBase64: previewImageBase64, filename: title })
-      });
-      const data = await res.json();
-      if (data.imageUrl) {
-        imagePath = data.imageUrl;
-      }
-    } catch (err) {}
-  }
-
-  const payload = {
-    title,
-    category,
-    price,
-    sizes: sizesInput ? sizesInput.split(',').map(s => s.trim()) : ['Standard'],
-    image: imagePath,
-    description
-  };
-
-  try {
-    const res = await fetch('/api/products', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if (data.product) {
-      products.unshift(data.product);
-    }
-  } catch (err) {
-    payload.id = 'prod_' + Date.now();
-    payload.createdAt = Date.now();
-    products.unshift(payload);
-    saveProducts();
-  }
-
-  renderCatalog();
-  document.getElementById('uploadProductForm').reset();
-  document.getElementById('imagePreviewBox').innerHTML = `
-    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--text-muted); margin-bottom: 0.5rem;"></i>
-    <span style="font-size: 0.85rem; color: var(--text-muted);">Click to browse image file</span>
-  `;
-  previewImageBase64 = null;
-  closeModal('uploadModal');
-  showToast(`Successfully uploaded "${title}"!`);
-}
-
-async function deleteProduct(id) {
-  if (confirm('Delete this sportswear upload?')) {
-    try {
-      await fetch(`/api/products/${id}`, { method: 'DELETE' });
-    } catch (err) {}
-    products = products.filter(p => p.id !== id);
-    saveProducts();
-    renderCatalog();
-    showToast('Upload deleted.');
-  }
 }
 
 function openQuickView(id) {

@@ -7,6 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -359,8 +360,121 @@ app.post('/api/visit', (req, res) => {
   res.json({ success: true, recorded: true, totalVisits: analyticsData.totalVisits, dailyVisitsToday: analyticsData.dailyVisits[dateStr] });
 });
 
+/* ==========================================================================
+   ADMIN AUTHENTICATION
+   Every action that adds, edits or deletes website content - products,
+   uploads, editable sections and the visitor log - requires a signed-in
+   administrator. Credentials come from environment variables; the defaults
+   below exist only so the project runs locally out of the box.
+   ========================================================================== */
+
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'dravsports2026';
+const ADMIN_SESSION_COOKIE = 'drav_admin_session';
+const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 hours
+
+// Active sessions live in memory: token -> { username, expiresAt }
+const adminSessions = new Map();
+
+// Brute-force throttle: ip -> { count, firstAttemptAt }
+const loginAttempts = new Map();
+const MAX_ATTEMPTS = 10;
+const ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
+
+// Constant-time comparison so credentials cannot be guessed by timing
+function safeEqual(a, b) {
+  const hashA = crypto.createHash('sha256').update(String(a)).digest();
+  const hashB = crypto.createHash('sha256').update(String(b)).digest();
+  return crypto.timingSafeEqual(hashA, hashB);
+}
+
+function parseCookies(req) {
+  const out = {};
+  const raw = req.headers.cookie;
+  if (!raw) return out;
+  raw.split(';').forEach(part => {
+    const idx = part.indexOf('=');
+    if (idx === -1) return;
+    const key = part.slice(0, idx).trim();
+    if (key) out[key] = decodeURIComponent(part.slice(idx + 1).trim());
+  });
+  return out;
+}
+
+// Returns the signed-in admin's session, or null
+function getAdminSession(req) {
+  const token = parseCookies(req)[ADMIN_SESSION_COOKIE];
+  if (!token) return null;
+
+  const session = adminSessions.get(token);
+  if (!session) return null;
+
+  if (session.expiresAt < Date.now()) {
+    adminSessions.delete(token);
+    return null;
+  }
+  return { token, username: session.username };
+}
+
+function sessionCookie(req, value, maxAgeSeconds) {
+  const secure = req.secure || req.headers['x-forwarded-proto'] === 'https' ? '; Secure' : '';
+  return `${ADMIN_SESSION_COOKIE}=${value}; HttpOnly; Max-Age=${maxAgeSeconds}; Path=/; SameSite=Strict${secure}`;
+}
+
+// Blocks any request that is not from a signed-in administrator
+function requireAdmin(req, res, next) {
+  if (getAdminSession(req)) return next();
+  res.status(401).json({ error: 'Authentication required', authenticated: false });
+}
+
+// API: Sign in
+app.post('/api/admin/login', (req, res) => {
+  const ip = req.ip || 'unknown';
+  const now = Date.now();
+
+  const record = loginAttempts.get(ip);
+  if (record && now - record.firstAttemptAt < ATTEMPT_WINDOW_MS) {
+    if (record.count >= MAX_ATTEMPTS) {
+      return res.status(429).json({ error: 'Too many failed attempts. Please try again later.' });
+    }
+  } else if (record) {
+    loginAttempts.delete(ip);
+  }
+
+  const { username, password } = req.body || {};
+
+  if (!safeEqual(username || '', ADMIN_USERNAME) || !safeEqual(password || '', ADMIN_PASSWORD)) {
+    const current = loginAttempts.get(ip) || { count: 0, firstAttemptAt: now };
+    current.count += 1;
+    loginAttempts.set(ip, current);
+    return res.status(401).json({ error: 'Invalid username or password' });
+  }
+
+  loginAttempts.delete(ip);
+
+  const token = crypto.randomBytes(32).toString('hex');
+  adminSessions.set(token, { username: ADMIN_USERNAME, expiresAt: now + SESSION_TTL_MS });
+
+  res.setHeader('Set-Cookie', sessionCookie(req, token, SESSION_TTL_MS / 1000));
+  res.json({ success: true, username: ADMIN_USERNAME });
+});
+
+// API: Sign out
+app.post('/api/admin/logout', (req, res) => {
+  const session = getAdminSession(req);
+  if (session) adminSessions.delete(session.token);
+  res.setHeader('Set-Cookie', sessionCookie(req, '', 0));
+  res.json({ success: true });
+});
+
+// API: Check whether the current browser holds a valid admin session
+app.get('/api/admin/session', (req, res) => {
+  const session = getAdminSession(req);
+  res.json({ authenticated: !!session, username: session ? session.username : null });
+});
+
 // API: Get Analytics Data (for Backend Dashboard)
-app.get('/api/analytics', (req, res) => {
+app.get('/api/analytics', requireAdmin, (req, res) => {
   const dateStr = new Date().toISOString().split('T')[0];
   const todayVisits = analyticsData.dailyVisits[dateStr] || 0;
 
@@ -382,7 +496,7 @@ app.get('/api/content', (req, res) => {
 });
 
 // API: Save website content from the admin panel
-app.put('/api/content', (req, res) => {
+app.put('/api/content', requireAdmin, (req, res) => {
   const body = req.body;
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     return res.status(400).json({ error: 'Invalid content payload' });
@@ -394,7 +508,7 @@ app.put('/api/content', (req, res) => {
 });
 
 // API: Reset website content back to the built-in defaults
-app.post('/api/content/reset', (req, res) => {
+app.post('/api/content/reset', requireAdmin, (req, res) => {
   contentData = JSON.parse(JSON.stringify(DEFAULT_CONTENT));
   writeJSON(CONTENT_FILE, contentData);
   res.json({ success: true, content: contentData });
@@ -406,7 +520,7 @@ app.get('/api/products', (req, res) => {
 });
 
 // API: Easy Image Upload (Base64 or Form payload)
-app.post('/api/upload', (req, res) => {
+app.post('/api/upload', requireAdmin, (req, res) => {
   try {
     const { imageBase64, filename } = req.body;
     if (!imageBase64) {
@@ -435,7 +549,7 @@ app.post('/api/upload', (req, res) => {
 });
 
 // API: Add new sportswear product
-app.post('/api/products', (req, res) => {
+app.post('/api/products', requireAdmin, (req, res) => {
   const { title, category, price, sizes, image, description } = req.body;
 
   if (!title || !price) {
@@ -460,15 +574,15 @@ app.post('/api/products', (req, res) => {
 });
 
 // API: Delete product
-app.delete('/api/products/:id', (req, res) => {
+app.delete('/api/products/:id', requireAdmin, (req, res) => {
   const id = req.params.id;
   productsData = productsData.filter(p => p.id !== id);
   writeJSON(PRODUCTS_FILE, productsData);
   res.json({ success: true, message: 'Product deleted successfully' });
 });
 
-// API: Customer Orders Endpoint
-app.get('/api/orders', (req, res) => {
+// API: Customer Orders Endpoint (contains customer details - admin only)
+app.get('/api/orders', requireAdmin, (req, res) => {
   res.json(ordersData);
 });
 
@@ -490,5 +604,9 @@ app.listen(PORT, () => {
   console.log(`📍 Location: Chuka Town, Tharaka Nithi County, Kenya`);
   console.log(`🌐 Storefront: http://localhost:${PORT}`);
   console.log(`⚙️  Admin Backend Portal: http://localhost:${PORT}/admin.html`);
+  if (!process.env.ADMIN_USERNAME || !process.env.ADMIN_PASSWORD) {
+    console.log(`🔐 Admin login: ${ADMIN_USERNAME} / ${process.env.ADMIN_PASSWORD ? '(from env)' : ADMIN_PASSWORD}`);
+    console.log(`⚠️  Default admin credentials in use - set ADMIN_USERNAME and ADMIN_PASSWORD before deploying.`);
+  }
   console.log(`===================================================`);
 });
